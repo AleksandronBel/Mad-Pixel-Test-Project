@@ -6,6 +6,9 @@ namespace Messages
 {
     public static class Messages
     {
+        public struct PlayerWin { }
+        public struct ReloadStats { }
+        public struct PlayerDead { }
         public struct PlayerShoot { }
 
         public struct PlayerDamage
@@ -18,11 +21,11 @@ namespace Messages
             }
         }
 
-        public struct AddScore
+        public struct HitTarget
         {
             public float ScoreCount { get; }
 
-            public AddScore(float scoreCount)
+            public HitTarget(float scoreCount)
             {
                 ScoreCount = scoreCount;
             }
@@ -40,9 +43,12 @@ namespace Messages
 
         public static void Install(DiContainer container, MessagePipeOptions options)
         {
+            container.BindMessageBroker<PlayerWin>(options);
+            container.BindMessageBroker<ReloadStats>(options);
+            container.BindMessageBroker<PlayerDead>(options);
             container.BindMessageBroker<PlayerShoot>(options);
             container.BindMessageBroker<PlayerDamage>(options);
-            container.BindMessageBroker<AddScore>(options);
+            container.BindMessageBroker<HitTarget>(options);
             container.BindMessageBroker<ShootRequest>(options);
         }
     }

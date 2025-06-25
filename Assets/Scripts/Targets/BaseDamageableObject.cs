@@ -1,16 +1,10 @@
-﻿using MessagePipe;
-using Projectile;
-using Targets;
+﻿using Projectile;
 using UnityEngine;
-using static Messages.Messages;
-using Zenject;
 
 namespace Targets
 {
     public class BaseDamageableObject : MonoBehaviour, IDamageable, IBreakable
     {
-        [Inject] private readonly IPublisher<AddScore> _addScore;
-
         [SerializeField] private GameObject _mainObjectObject;
         [SerializeField] private float _hitPoints = 1f;
         [SerializeField] private AudioSource _breakSfx;
@@ -40,10 +34,9 @@ namespace Targets
             _mainObjectObject.SetActive(false);
             _boxColliderTrigger.enabled = false;
 
+            _breakSfx.pitch = Random.Range(0.8f, 1.3f);
             _breakSfx.PlayOneShot(_breakSfx.clip);
             _breakParticleSystem.Play();
-
-            _addScore.Publish(new(_hitPoints));
         }
     }
 }

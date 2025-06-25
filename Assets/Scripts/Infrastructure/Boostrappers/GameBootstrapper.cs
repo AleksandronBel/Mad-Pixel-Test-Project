@@ -10,6 +10,8 @@ namespace Infrastructure.Bootsrappers
 
         private async void Awake()
         {
+            Application.targetFrameRate = 60;
+
             await SceneManager.LoadSceneAsync(menuSceneName);
         }
     }

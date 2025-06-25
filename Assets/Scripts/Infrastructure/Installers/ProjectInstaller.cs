@@ -1,25 +1,26 @@
 ﻿using Extentions;
-using Factories;
 using Infrastructure.Services;
 using MessagePipe;
 using Player;
-using Systems;
+using Projectile;
+using UnityEngine;
 using Zenject;
 
 namespace Infrastructure.Installers
 {
     public class ProjectInstaller : MonoInstaller
     {
-        MessagePipeOptions messagePipeOptions;
+        [SerializeField] private ProjectileItemView _projectilePrefab;
+        private MessagePipeOptions _messagePipeOptions;
 
         public override void InstallBindings()
         {
             RegisterMessagePipe();
             BindServices();
-            BindGameFactory();
+            BindProjectilePool();
         }
 
-        void BindServices()
+        private void BindServices()
         {
             Container.BindInterfacesAndSelfTo<InputService>()
                      .AsSingle()
@@ -30,16 +31,17 @@ namespace Infrastructure.Installers
                      .NonLazy();
         }
 
-        void BindGameFactory()
+        private void BindProjectilePool()
         {
-            Container.Bind<GameFactory>()
-                     .AsSingle()
-                     .NonLazy();
+            Container.BindMemoryPool<ProjectileItemView, ProjectilePool>()
+                .WithInitialSize(10)
+                .FromComponentInNewPrefab(_projectilePrefab)
+                .UnderTransformGroup("Projectiles");
         }
 
         void RegisterMessagePipe()
         {
-            messagePipeOptions = Container.BindMessagePipe();
+            _messagePipeOptions = Container.BindMessagePipe();
             GlobalMessagePipe.SetProvider(Container.AsServiceProvider());
             GetType().Assembly.GetTypes().ForEach(x =>
             {
@@ -58,7 +60,7 @@ namespace Infrastructure.Installers
                 if (parameterInfos[0].ParameterType != typeof(DiContainer) || parameterInfos[1].ParameterType != typeof(MessagePipeOptions))
                     return;
 
-                methodInfo.Invoke(null, new object[] { Container, messagePipeOptions });
+                methodInfo.Invoke(null, new object[] { Container, _messagePipeOptions });
             });
         }
 

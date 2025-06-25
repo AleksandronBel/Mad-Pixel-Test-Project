@@ -6,18 +6,22 @@ using Zenject;
 namespace Projectile
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ProjectileItemView : MonoBehaviour, IPoolable<IMemoryPool>
+    public class ProjectileItemView : MonoBehaviour
     {
-        [SerializeField] float _speed = 60f;
-        [SerializeField] float _maxLifetime= 5f;
-        [SerializeField] float _damage = 1f;
+        [SerializeField] private float _speed = 60f;
+        [SerializeField] private float _maxLifetime = 10f;
+        [SerializeField] private float _damage = 1f;
 
         private Rigidbody _rigidbody;
-        private IMemoryPool _pool;
-
-        public class Factory : PlaceholderFactory<ProjectileItemView> { }
+        private ProjectilePool _pool;
 
         private void Awake() => _rigidbody = GetComponent<Rigidbody>();
+
+        [Inject]
+        private void Construct(ProjectilePool pool)
+        {
+            _pool = pool;
+        }
 
         public void Launch(Vector3 origin, Vector3 dir)
         {
@@ -44,7 +48,8 @@ namespace Projectile
         private void ChangeVelocity()
         {
             Vector3 currentVelocity = _rigidbody.velocity;
-            float speed = currentVelocity.magnitude * 0.5f; 
+
+            float speed = currentVelocity.magnitude * 0.1f; 
 
             Vector3 randomDirection = new Vector3(
                 UnityEngine.Random.Range(-0.2f, 0.2f), 
@@ -54,8 +59,5 @@ namespace Projectile
 
             _rigidbody.velocity = (currentVelocity.normalized + randomDirection * 0.3f).normalized * speed;
         }
-
-        public void OnDespawned() => _rigidbody.velocity = Vector3.zero;
-        public void OnSpawned(IMemoryPool pool) => _pool = pool;
     }
 }

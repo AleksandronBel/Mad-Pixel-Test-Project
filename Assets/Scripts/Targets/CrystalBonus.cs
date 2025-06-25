@@ -1,34 +1,28 @@
-﻿using Targets;
-using UnityEngine;
+﻿using MessagePipe;
+using Zenject;
+using static Messages.Messages;
 
 namespace Targets
 {
     public class CrystalBonus : BaseDamageableObject, IBonusable
     {
-        [SerializeField] private GameObject _pointLight;
+        [Inject] private readonly IPublisher<HitTarget> _hitTarget;
 
         private void Start()
         {
             PrepareObject();
         }
 
-        protected override void PrepareObject()
-        {
-            base.PrepareObject();
-            _pointLight.SetActive(true);
-        }
-
         public override void BreakTarget()
         {
             base.BreakTarget();
-            _pointLight.SetActive(false);
 
             GetBonus();
         }
 
         public void GetBonus()
         {
-            //+ammo to player + health to player
+            _hitTarget.Publish(new());
         }
     }
 }

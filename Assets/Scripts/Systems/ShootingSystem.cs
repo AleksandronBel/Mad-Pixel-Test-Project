@@ -1,5 +1,4 @@
-﻿using Factories;
-using MessagePipe;
+﻿using MessagePipe;
 using Player;
 using Projectile;
 using R3;
@@ -14,17 +13,17 @@ namespace Systems
         [Inject] private ISubscriber<ShootRequest> _shootSubscriber;
         [Inject] private IPublisher<PlayerShoot> _playerShoot;
 
-        [SerializeField] private ProjectileItemView _projectilePrefab;
         [SerializeField] private Camera _camera;
 
         private PlayerStats _playerState;
-        private GameFactory _gameFactory;
+        private ProjectilePool _projectilePool;
+        private Vector3 _startedProjectileOffset = new Vector3(0f, 0f, 3f);
 
         [Inject]
-        private void Construct(PlayerStats state, GameFactory gameFactory)
+        private void Construct(PlayerStats state, ProjectilePool projectilePool)
         {
             _playerState = state;
-            _gameFactory = gameFactory;
+            _projectilePool = projectilePool;
 
             _shootSubscriber.Subscribe(message => OnShootRequested(message.Position)).AddTo(this);
         }
@@ -37,8 +36,7 @@ namespace Systems
 
             _playerShoot.Publish(new());
 
-            var projectile = _gameFactory.Instantiate(_projectilePrefab, null);
-            projectile.Launch(_camera.transform.position, ray.direction);
+            _projectilePool.Spawn(_camera.transform.position + _startedProjectileOffset, ray.direction);
         }
     }
 }
