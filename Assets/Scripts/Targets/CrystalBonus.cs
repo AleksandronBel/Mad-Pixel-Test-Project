@@ -1,42 +1,29 @@
-﻿using Factories;
-using Projectile;
+﻿using Targets;
 using UnityEngine;
-using Zenject;
 
 namespace Targets
 {
-    public class CrystalBonus : MonoBehaviour, IDamageable, IBreakable, IBonusable
+    public class CrystalBonus : BaseDamageableObject, IBonusable
     {
-        [SerializeField] private float _hitPoints = 1f;
-        [SerializeField] private FractureItemView _fracturePrefab;
-        [SerializeField] private AudioSource _breakSfx;
+        [SerializeField] private GameObject _pointLight;
 
-        private GameFactory _gameFactory;
-
-        [Inject]
-        private void Construct(GameFactory gameFactory)
+        private void Start()
         {
-            _gameFactory = gameFactory;
+            PrepareObject();
         }
 
-        public void TakeDamage(float dmg)
+        protected override void PrepareObject()
         {
-            _hitPoints -= dmg;
-            if (_hitPoints <= 0)
-                BreakTarget();
+            base.PrepareObject();
+            _pointLight.SetActive(true);
         }
 
-        public void BreakTarget()
+        public override void BreakTarget()
         {
-            var fracture = _gameFactory.Instantiate(_fracturePrefab, null); //использовать пул
-
-            fracture.transform.position = transform.position;
-            fracture.transform.rotation = Quaternion.identity;
-
-            _breakSfx.PlayOneShot(_breakSfx.clip);
+            base.BreakTarget();
+            _pointLight.SetActive(false);
 
             GetBonus();
-            Destroy(gameObject);
         }
 
         public void GetBonus()

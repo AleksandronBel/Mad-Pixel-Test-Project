@@ -17,13 +17,10 @@ namespace Menu
 
         private void Start()
         {
-            _startGameButton.OnClickAsObservable().Subscribe(_ => StartGame()).AddTo(this);
-            _settingsButton.OnClickAsObservable().Subscribe(_ => OpenSettingsPanel()).AddTo(this);
-            _exitGameButton.OnClickAsObservable().Subscribe(_ => ExitGame()).AddTo(this);
+            SubscribeAllButtons();
         }
 
-        [Inject]
-        private void Construct()
+        private void SubscribeAllButtons()
         {
             _startGameButton.OnClickAsObservable().Subscribe(_ => StartGame()).AddTo(this);
             _settingsButton.OnClickAsObservable().Subscribe(_ => OpenSettingsPanel()).AddTo(this);

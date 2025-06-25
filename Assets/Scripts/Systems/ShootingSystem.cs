@@ -12,15 +12,16 @@ namespace Systems
     public class ShootingSystem : MonoBehaviour
     {
         [Inject] private ISubscriber<ShootRequest> _shootSubscriber;
+        [Inject] private IPublisher<PlayerShoot> _playerShoot;
 
         [SerializeField] private ProjectileItemView _projectilePrefab;
         [SerializeField] private Camera _camera;
 
-        private PlayerService _playerState;
+        private PlayerStats _playerState;
         private GameFactory _gameFactory;
 
         [Inject]
-        private void Construct(PlayerService state, GameFactory gameFactory)
+        private void Construct(PlayerStats state, GameFactory gameFactory)
         {
             _playerState = state;
             _gameFactory = gameFactory;
@@ -32,9 +33,9 @@ namespace Systems
         {
             var ray = _camera.ScreenPointToRay(position);
 
-            if (_playerState.Ammo.Value <= 0) return;
+            if (_playerState.Ammo.CurrentValue <= 0) return;
 
-            _playerState.Ammo.Value--;
+            _playerShoot.Publish(new());
 
             var projectile = _gameFactory.Instantiate(_projectilePrefab, null);
             projectile.Launch(_camera.transform.position, ray.direction);

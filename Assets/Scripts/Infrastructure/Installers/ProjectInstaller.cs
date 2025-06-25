@@ -25,7 +25,7 @@ namespace Infrastructure.Installers
                      .AsSingle()
                      .NonLazy();
 
-            Container.Bind<PlayerService>()
+            Container.Bind<PlayerStats>()
                      .AsSingle()
                      .NonLazy();
         }

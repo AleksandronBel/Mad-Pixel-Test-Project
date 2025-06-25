@@ -1,40 +1,31 @@
-﻿using UnityEngine;
-using Projectile;
+﻿using MessagePipe;
+using Targets;
+using static Messages.Messages;
 using Zenject;
-using Factories;
+using System;
+using UnityEngine;
+using Player;
 
 namespace Targets
 {
-    public class GlassObstacle : MonoBehaviour, IDamageable, IBreakable
+    public class GlassObstacle : BaseDamageableObject, IDangerable
     {
-        [SerializeField] private float _hitPoints = 1f;
-        [SerializeField] private FractureItemView _fracturePrefab;
-        [SerializeField] private AudioSource _breakSfx;
+        [Inject] private readonly IPublisher<PlayerDamage> _playerDamage;
 
-        private GameFactory _gameFactory;
+        [SerializeField] private float _damageCount = 1f;
 
-        [Inject]
-        private void Construct(GameFactory gameFactory)
+        private void OnTriggerEnter(Collider other)
         {
-            _gameFactory = gameFactory;
-        }
-
-        public void TakeDamage(float dmg)
-        {
-            _hitPoints -= dmg;
-            if (_hitPoints <= 0)
+            if (other.TryGetComponent(out PlayerMover player))
+            {
+                GiveDamage();
                 BreakTarget();
+            }
         }
 
-        public void BreakTarget()
+        public void GiveDamage()
         {
-            var fracture = _gameFactory.Instantiate(_fracturePrefab, null);
-
-            fracture.transform.position = transform.position;
-            fracture.transform.rotation = Quaternion.identity;
-
-            _breakSfx.PlayOneShot(_breakSfx.clip);
-            Destroy(gameObject);
+            _playerDamage.Publish(new(_damageCount));
         }
     }
 }

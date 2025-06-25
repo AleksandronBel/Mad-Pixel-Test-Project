@@ -6,9 +6,9 @@ namespace Player
     public class PlayerMover : MonoBehaviour
     {
         [SerializeField] private float speed = 5f;
-        private Rigidbody _rb;
+        private Rigidbody _rigidbody;
 
-        private void Awake() => _rb = GetComponent<Rigidbody>();
-        private void FixedUpdate() => _rb.velocity = Vector3.forward * speed;
+        private void Awake() => _rigidbody = GetComponent<Rigidbody>();
+        private void FixedUpdate() => _rigidbody.velocity = Vector3.forward * speed;
     }
 }

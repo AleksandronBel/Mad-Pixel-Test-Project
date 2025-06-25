@@ -6,7 +6,7 @@ using Zenject;
 namespace Projectile
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class ProjectileItemView : MonoBehaviour, IPoolable<IMemoryPool>, IDisposable
+    public class ProjectileItemView : MonoBehaviour, IPoolable<IMemoryPool>
     {
         [SerializeField] float _speed = 60f;
         [SerializeField] float _maxLifetime= 5f;
@@ -37,15 +37,25 @@ namespace Projectile
             if (other.TryGetComponent(out IDamageable dmg))
             {
                 dmg.TakeDamage(_damage);
+                ChangeVelocity();
             }
-            _pool.Despawn(this);
+        }
+
+        private void ChangeVelocity()
+        {
+            Vector3 currentVelocity = _rigidbody.velocity;
+            float speed = currentVelocity.magnitude * 0.5f; 
+
+            Vector3 randomDirection = new Vector3(
+                UnityEngine.Random.Range(-0.2f, 0.2f), 
+                UnityEngine.Random.Range(-0.2f, 0.2f), 
+                UnityEngine.Random.Range(-0.2f, -0.1f)  
+            ).normalized;
+
+            _rigidbody.velocity = (currentVelocity.normalized + randomDirection * 0.3f).normalized * speed;
         }
 
         public void OnDespawned() => _rigidbody.velocity = Vector3.zero;
         public void OnSpawned(IMemoryPool pool) => _pool = pool;
-        public void Dispose() 
-        { 
-
-        } 
     }
 }
